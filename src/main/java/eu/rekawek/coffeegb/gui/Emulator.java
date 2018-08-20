@@ -44,7 +44,7 @@ public class Emulator {
     private JFrame mainWindow;
 
     public Emulator(String[] args, Properties properties) throws IOException {
-        options = parseArgs(args);
+        options = parseStaticArgs();
         rom = new Cartridge(options);
         speedMode = new SpeedMode();
         serialEndpoint = SerialEndpoint.NULL_ENDPOINT;
@@ -63,6 +63,12 @@ public class Emulator {
             gameboy = new Gameboy(options, rom, display, controller, sound, serialEndpoint, console);
         }
         console.ifPresent(c -> c.init(gameboy));
+    }
+
+    private static GameboyOptions parseStaticArgs() {
+        File romFile = new File("/tmp/javagb/ekkel.gameboy/testroms/03-op_sp_hl.gb");
+        GameboyOptions gameboyOptions = new GameboyOptions(romFile);
+        return gameboyOptions;
     }
 
     private static GameboyOptions parseArgs(String[] args) {
@@ -134,7 +140,7 @@ public class Emulator {
         new Thread(gameboy).start();
     }
 
-    private void stopGui() {
+    private void stopGui() throws IOException {
         display.stop();
         gameboy.stop();
         mainWindow.dispose();

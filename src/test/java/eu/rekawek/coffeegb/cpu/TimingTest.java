@@ -6,6 +6,8 @@ import eu.rekawek.coffeegb.gpu.Display;
 import eu.rekawek.coffeegb.memory.Ram;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertEquals;
 
 public class TimingTest {
@@ -16,13 +18,13 @@ public class TimingTest {
 
     private final AddressSpace memory;
 
-    public TimingTest() {
+    public TimingTest() throws IOException {
         memory = new Ram(0x00, 0x10000);
         cpu = new Cpu(memory, new InterruptManager(false), null, Display.NULL_DISPLAY, new SpeedMode());
     }
 
     @Test
-    public void testTiming() {
+    public void testTiming() throws IOException {
         assertTiming(16, 0xc9, 0, 0); // RET
         assertTiming(16, 0xd9, 0, 0); // RETI
         cpu.getRegisters().getFlags().setZ(false);
@@ -72,7 +74,7 @@ public class TimingTest {
         assertTiming(4, 0x00); // NOP
     }
 
-    private void assertTiming(int expectedTiming, int... opcodes) {
+    private void assertTiming(int expectedTiming, int... opcodes) throws IOException {
         for (int i = 0; i < opcodes.length; i++) {
             memory.setByte(OFFSET + i, opcodes[i]);
         }

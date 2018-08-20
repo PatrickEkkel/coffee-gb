@@ -1,6 +1,7 @@
 package eu.rekawek.coffeegb.cpu;
 
 import eu.rekawek.coffeegb.AddressSpace;
+import eu.rekawek.coffeegb.Tracer;
 import eu.rekawek.coffeegb.cpu.op.Op;
 import eu.rekawek.coffeegb.cpu.opcode.Opcode;
 import eu.rekawek.coffeegb.gpu.Display;
@@ -9,6 +10,7 @@ import eu.rekawek.coffeegb.gpu.GpuRegister;
 import eu.rekawek.coffeegb.gpu.Lcdc;
 import eu.rekawek.coffeegb.gpu.SpriteBug;
 
+import java.io.IOException;
 import java.util.List;
 
 public class Cpu {
@@ -55,16 +57,19 @@ public class Cpu {
 
     private boolean haltBugMode;
 
-    public Cpu(AddressSpace addressSpace, InterruptManager interruptManager, Gpu gpu, Display display, SpeedMode speedMode) {
+    public Tracer tracer;
+
+    public Cpu(AddressSpace addressSpace, InterruptManager interruptManager, Gpu gpu, Display display, SpeedMode speedMode) throws IOException {
         this.registers = new Registers();
         this.addressSpace = addressSpace;
         this.interruptManager = interruptManager;
         this.gpu = gpu;
         this.display = display;
         this.speedMode = speedMode;
+        this.tracer =  new Tracer("/tmp/trace_coffeegb.log");
     }
 
-    public void tick() {
+    public void tick() throws IOException {
         if (++clockCycle >= (4 / speedMode.getSpeedMode())) {
             clockCycle = 0;
         } else {
@@ -182,6 +187,10 @@ public class Cpu {
                             handleSpriteBug(corruptionType);
                         }
                         opContext = op.execute(registers, addressSpace, operand, opContext);
+
+
+                        tracer.write(op, registers);
+
                         op.switchInterrupts(interruptManager);
 
                         if (!op.proceed(registers)) {
