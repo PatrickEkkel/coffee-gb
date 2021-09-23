@@ -66,7 +66,7 @@ public class Cpu {
         this.gpu = gpu;
         this.display = display;
         this.speedMode = speedMode;
-        this.tracer =  new Tracer("/tmp/trace_coffeegb.log");
+        this.tracer =  new Tracer("/home/patrick/Git/github/javagb/ekkel.gameboy/testroms/trace_coffeegb.log");
     }
 
     public void tick() throws IOException {
@@ -123,6 +123,7 @@ public class Cpu {
                     } else {
                         haltBugMode = false;
                     }
+                    tracer.write(currentOpcode,registers);
                     break;
 
                 case EXT_OPCODE:
@@ -176,6 +177,8 @@ public class Cpu {
 
                     if (opIndex < ops.size()) {
                         Op op = ops.get(opIndex);
+
+
                         boolean opAccessesMemory = op.readsMemory() || op.writesMemory();
                         if (accessedMemory && opAccessesMemory) {
                             return;
@@ -189,7 +192,6 @@ public class Cpu {
                         opContext = op.execute(registers, addressSpace, operand, opContext);
 
 
-                        tracer.write(op, registers);
 
                         op.switchInterrupts(interruptManager);
 

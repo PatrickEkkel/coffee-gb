@@ -66,7 +66,7 @@ public class Emulator {
     }
 
     private static GameboyOptions parseStaticArgs() {
-        File romFile = new File("/tmp/javagb/ekkel.gameboy/testroms/03-op_sp_hl.gb");
+        File romFile = new File("/home/patrick/Git/github/javagb/ekkel.gameboy/testroms/03-op_sp_hl.gb");
         GameboyOptions gameboyOptions = new GameboyOptions(romFile);
         return gameboyOptions;
     }

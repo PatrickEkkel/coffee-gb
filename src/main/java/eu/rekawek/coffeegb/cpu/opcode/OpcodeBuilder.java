@@ -407,7 +407,7 @@ public class OpcodeBuilder {
 
             @Override
             public String toString() {
-                return String.format("%s(HL) → [__]");
+                return String.format("%s(HL) → [__]", operation);
             }
         });
         store("HL");
