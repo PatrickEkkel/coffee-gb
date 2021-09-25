@@ -118,12 +118,12 @@ public class Cpu {
                             throw new IllegalStateException(String.format("No command for 0x%02x", opcode1));
                         }
                     }
+                    tracer.write(currentOpcode,registers);
                     if (!haltBugMode) {
                         registers.incrementPC();
                     } else {
                         haltBugMode = false;
                     }
-                    tracer.write(currentOpcode,registers);
                     break;
 
                 case EXT_OPCODE:
