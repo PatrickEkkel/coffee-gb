@@ -28,7 +28,7 @@ public class Tracer {
         String registerState = String.format("HL:%s;AF:%s;BC:%s;DE:%s;SP:%s",HL, AF,BC, DE, SP);
 
         if(opcode != null) {
-            this.writer.write(String.format("C:%s;PC:%s;OPCODE:%s;%s; \n", opcodeCounter, toHex(registers.getPC()), toHex(opcode.getOpcode()), registerState));
+            this.writer.write(String.format("C:%s;PC:%s;OPCODE:%s;%s;\n", opcodeCounter, toHex(registers.getPC()), toHex(opcode.getOpcode()), registerState));
         }
         opcodeCounter += 1;
     }
