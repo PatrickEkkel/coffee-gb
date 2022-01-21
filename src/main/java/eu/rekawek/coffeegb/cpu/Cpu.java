@@ -139,6 +139,7 @@ public class Cpu {
                         throw new IllegalStateException(String.format("No command for %0xcb 0x%02x", opcode2));
                     }
                     state = State.OPERAND;
+                    tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers);
                     registers.incrementPC();
                     break;
 
