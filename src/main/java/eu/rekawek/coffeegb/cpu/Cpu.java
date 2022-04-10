@@ -66,7 +66,9 @@ public class Cpu {
         this.gpu = gpu;
         this.display = display;
         this.speedMode = speedMode;
-        this.tracer =  new Tracer("/home/patrick/Git/github/javagb/ekkel.gameboy/testroms/trace_coffeegb.log");
+        String opcodeFilename = "/tmp/trace_opcode_coffeegb.log";
+        String memoryFilename = "/tmp/timertracer_coffeegb.log";
+        this.tracer =  new Tracer(opcodeFilename, memoryFilename);
     }
 
     public void tick() throws IOException {
@@ -118,7 +120,7 @@ public class Cpu {
                             throw new IllegalStateException(String.format("No command for 0x%02x", opcode1));
                         }
                     }
-                    tracer.write(currentOpcode,registers);
+                    tracer.write(currentOpcode,registers,addressSpace, clockCycle);
                     if (!haltBugMode) {
                         registers.incrementPC();
                     } else {
@@ -139,7 +141,7 @@ public class Cpu {
                         throw new IllegalStateException(String.format("No command for %0xcb 0x%02x", opcode2));
                     }
                     state = State.OPERAND;
-                    tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers);
+                    tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers,addressSpace,clockCycle);
                     registers.incrementPC();
                     break;
 

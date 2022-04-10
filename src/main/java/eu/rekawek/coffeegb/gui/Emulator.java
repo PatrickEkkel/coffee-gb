@@ -66,7 +66,7 @@ public class Emulator {
     }
 
     private static GameboyOptions parseStaticArgs() {
-        File romFile = new File("/home/patrick/Git/github/javagb/ekkel.gameboy/testroms/08_misc.gb");
+        File romFile = new File("/home/patrick/Git/github/javagb/ekkel.gameboy/testroms/02_interrupts.gb");
         GameboyOptions gameboyOptions = new GameboyOptions(romFile);
         return gameboyOptions;
     }
