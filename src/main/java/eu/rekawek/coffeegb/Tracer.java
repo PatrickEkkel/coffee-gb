@@ -36,7 +36,7 @@ public class Tracer {
         opcodeCounter += 1;
     }
 
-    private void writeMemoryTrace(Registers registers, AddressSpace addressSpace, int clockCycle) throws IOException {
+    private void writeMemoryTrace(Opcode opcode, Registers registers, AddressSpace addressSpace, int clockCycle) throws IOException {
 
         String PC = toHex(registers.getPC());
         String Clock = String.valueOf(clockCycle);
@@ -44,14 +44,17 @@ public class Tracer {
         String TAC =  toHex(addressSpace.getByte(0xFF07));
         String DIV = toHex(addressSpace.getByte(0xFF04));
         String TMA = toHex(addressSpace.getByte(0xFF06));
-        String registerState = String.format("COUNT:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s\n",opcodeCounter,PC,TIMA,TAC,DIV,TMA);
+        if(opcode != null) {
+            String registerState = String.format("COUNT:%s;OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s\n",opcodeCounter, toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA);
+            this.memoryTraceWriter.write(registerState);
+        }
 
-        this.memoryTraceWriter.write(registerState);
+
     }
 
     public void write(Opcode opcode, Registers registers, AddressSpace addressSpace, int clockCycle) throws IOException {
         writeOpcode(opcode, registers);
-        writeMemoryTrace(registers, addressSpace, clockCycle);
+        writeMemoryTrace(opcode, registers, addressSpace, clockCycle);
     }
 
     public void close() throws IOException {
