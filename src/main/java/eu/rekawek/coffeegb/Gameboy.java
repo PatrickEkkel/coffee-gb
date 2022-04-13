@@ -60,6 +60,8 @@ public class Gameboy implements Runnable {
 
     private volatile boolean doStop;
 
+    public Tracer tracer;
+
     private final List<Runnable> tickListeners = new ArrayList<>();
 
     public Gameboy(GameboyOptions options, Cartridge rom, Display display, Controller controller, SoundOutput soundOutput, SerialEndpoint serialEndpoint) throws IOException {
@@ -100,8 +102,10 @@ public class Gameboy implements Runnable {
         }
         mmu.addAddressSpace(new Ram(0xff80, 0x7f));
         mmu.addAddressSpace(new ShadowAddressSpace(mmu, 0xe000, 0xc000, 0x1e00));
-
-        cpu = new Cpu(mmu, interruptManager, gpu, display, speedMode);
+        String opcodeFilename = "/tmp/trace_opcode_coffeegb.log";
+        String memoryFilename = "/tmp/timertracer_coffeegb.log";
+        this.tracer = new Tracer(opcodeFilename, memoryFilename);
+        cpu = new Cpu(mmu, interruptManager, gpu, display, speedMode,tracer);
 
         interruptManager.disableInterrupts(false);
         if (!options.isUsingBootstrap()) {

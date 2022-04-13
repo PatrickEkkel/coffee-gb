@@ -174,6 +174,7 @@ public class Gpu implements AddressSpace {
 
         Mode oldMode = mode;
         ticksInLine++;
+       // System.out.println(ticksInLine);
         if (phase.tick()) {
             // switch line 153 to 0
             if (ticksInLine == 4 && mode == Mode.VBlank && r.get(LY) == 153) {

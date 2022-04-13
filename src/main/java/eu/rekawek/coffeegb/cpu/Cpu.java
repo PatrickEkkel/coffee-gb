@@ -37,6 +37,8 @@ public class Cpu {
 
     private Opcode currentOpcode;
 
+    private int cycles = -4;
+
     private List<Op> ops;
 
     private int operandIndex;
@@ -59,24 +61,30 @@ public class Cpu {
 
     public Tracer tracer;
 
-    public Cpu(AddressSpace addressSpace, InterruptManager interruptManager, Gpu gpu, Display display, SpeedMode speedMode) throws IOException {
+
+
+    public Cpu(AddressSpace addressSpace, InterruptManager interruptManager, Gpu gpu, Display display, SpeedMode speedMode,Tracer tracer) throws IOException {
         this.registers = new Registers();
         this.addressSpace = addressSpace;
         this.interruptManager = interruptManager;
         this.gpu = gpu;
         this.display = display;
         this.speedMode = speedMode;
-        String opcodeFilename = "/tmp/trace_opcode_coffeegb.log";
-        String memoryFilename = "/tmp/timertracer_coffeegb.log";
-        this.tracer =  new Tracer(opcodeFilename, memoryFilename);
+
+        this.tracer = tracer;
     }
 
     public void tick() throws IOException {
         if (++clockCycle >= (4 / speedMode.getSpeedMode())) {
             clockCycle = 0;
+         //   cycles++;
         } else {
             return;
         }
+        cycles += 4;
+
+
+
 
         if (state == State.OPCODE || state == State.HALTED || state == State.STOPPED) {
             if (interruptManager.isIme() && interruptManager.isInterruptRequested()) {
@@ -120,7 +128,7 @@ public class Cpu {
                             throw new IllegalStateException(String.format("No command for 0x%02x", opcode1));
                         }
                     }
-                    tracer.write(currentOpcode,registers,addressSpace, clockCycle);
+                    tracer.write(currentOpcode,registers,addressSpace, cycles);
                     if (!haltBugMode) {
                         registers.incrementPC();
                     } else {
@@ -196,6 +204,7 @@ public class Cpu {
 
 
 
+
                         op.switchInterrupts(interruptManager);
 
                         if (!op.proceed(registers)) {
@@ -224,7 +233,9 @@ public class Cpu {
                 case STOPPED:
                     return;
             }
+            //cycles++;
         }
+
     }
 
     private void handleInterrupt() {

@@ -58,7 +58,12 @@ public class MemoryRegisters implements AddressSpace {
 
     public void put(Register reg, int value) {
         if (registers.containsKey(reg.getAddress())) {
-            values.put(reg.getAddress(), value);
+            if(reg.getAddress() == 0xFF44) {
+                values.put(reg.getAddress(),0x0);
+            }
+            else {
+                values.put(reg.getAddress(), value);
+            }
         } else {
             throw new IllegalArgumentException("Not valid register: " + reg);
         }

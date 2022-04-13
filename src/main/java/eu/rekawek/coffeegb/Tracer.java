@@ -9,6 +9,7 @@ import java.io.IOException;
 
 public class Tracer {
     long opcodeCounter = 0;
+    int clockCycles = 0;
     private BufferedWriter opcodeWriter;
     private BufferedWriter memoryTraceWriter;
     public Tracer(String opcodeTraceFilename, String memoryTraceFilename) throws IOException {
@@ -42,10 +43,12 @@ public class Tracer {
         String Clock = String.valueOf(clockCycle);
         String TIMA = toHex(addressSpace.getByte(0xFF05));
         String TAC =  toHex(addressSpace.getByte(0xFF07));
-        String DIV = toHex(addressSpace.getByte(0xFF04));
+        String LY = toHex(addressSpace.getByte(0xFF44));
+        //String DIV = toHex(addressSpace.getByte(0xFF04));
+        String DIV = "0x0";
         String TMA = toHex(addressSpace.getByte(0xFF06));
         if(opcode != null) {
-            String registerState = String.format("COUNT:%s;OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s\n",opcodeCounter, toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA);
+            String registerState = String.format("COUNT:%s;OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;CLOCK:%s\n",opcodeCounter, toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,clockCycle);
             this.memoryTraceWriter.write(registerState);
         }
 
