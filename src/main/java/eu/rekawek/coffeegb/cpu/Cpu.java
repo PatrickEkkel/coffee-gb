@@ -129,6 +129,11 @@ public class Cpu {
                         }
                     }
                     tracer.write(currentOpcode,registers,addressSpace, cycles);
+
+                    if(this.cycles > 69905) {
+                        this.cycles = 0;
+                    }
+
                     if (!haltBugMode) {
                         registers.incrementPC();
                     } else {
