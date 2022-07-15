@@ -142,6 +142,7 @@ public class Cpu {
                     break;
 
                 case EXT_OPCODE:
+                    tracer.write(currentOpcode,registers,addressSpace,cycles);
                     if (accessedMemory) {
                         return;
                     }
@@ -154,7 +155,12 @@ public class Cpu {
                         throw new IllegalStateException(String.format("No command for %0xcb 0x%02x", opcode2));
                     }
                     state = State.OPERAND;
-                    tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers,addressSpace,clockCycle);
+                    tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers,addressSpace,cycles);
+                  //  if(this.cycles > 69905) {
+                   //     this.cycles = 0;
+                    //}
+                   // cycles += 4;
+
                     registers.incrementPC();
                     break;
 
@@ -169,6 +175,7 @@ public class Cpu {
                     }
                     ops = currentOpcode.getOps();
                     state = State.RUNNING;
+                   // tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers,addressSpace,cycles);
                     break;
 
                 case RUNNING:

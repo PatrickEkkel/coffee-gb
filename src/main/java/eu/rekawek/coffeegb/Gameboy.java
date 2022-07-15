@@ -69,12 +69,16 @@ public class Gameboy implements Runnable {
     }
 
     public Gameboy(GameboyOptions options, Cartridge rom, Display display, Controller controller, SoundOutput soundOutput, SerialEndpoint serialEndpoint, Optional<Console> console) throws IOException {
+        String opcodeFilename = "/tmp/cputracer_coffeegb.log";
+        String memoryFilename = "/tmp/memorytracer_coffeegb.log";
+        String registerFilename = "/tmp/registertracer_coffeegb.log";
+        this.tracer = new Tracer(opcodeFilename, memoryFilename,registerFilename);
         this.display = display;
         gbc = rom.isGbc();
         speedMode = new SpeedMode();
         interruptManager = new InterruptManager(gbc);
         timer = new Timer(interruptManager, speedMode);
-        mmu = new Mmu();
+        mmu = new Mmu(tracer);
 
         Ram oamRam = new Ram(0xfe00, 0x00a0);
         dma = new Dma(mmu, oamRam, speedMode);
@@ -102,9 +106,7 @@ public class Gameboy implements Runnable {
         }
         mmu.addAddressSpace(new Ram(0xff80, 0x7f));
         mmu.addAddressSpace(new ShadowAddressSpace(mmu, 0xe000, 0xc000, 0x1e00));
-        String opcodeFilename = "/tmp/trace_opcode_coffeegb.log";
-        String memoryFilename = "/tmp/timertracer_coffeegb.log";
-        this.tracer = new Tracer(opcodeFilename, memoryFilename);
+
         cpu = new Cpu(mmu, interruptManager, gpu, display, speedMode,tracer);
 
         interruptManager.disableInterrupts(false);
@@ -176,7 +178,7 @@ public class Gameboy implements Runnable {
         if (hdma.isTransferInProgress()) {
             hdma.tick();
         } else {
-            cpu.tick();
+           cpu.tick();
         }
         dma.tick();
         sound.tick();

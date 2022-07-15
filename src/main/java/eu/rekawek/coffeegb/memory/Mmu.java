@@ -1,6 +1,8 @@
 package eu.rekawek.coffeegb.memory;
 
 import eu.rekawek.coffeegb.AddressSpace;
+import eu.rekawek.coffeegb.Dumpable;
+import eu.rekawek.coffeegb.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,9 +12,14 @@ import java.util.List;
 import static eu.rekawek.coffeegb.cpu.BitUtils.checkByteArgument;
 import static eu.rekawek.coffeegb.cpu.BitUtils.checkWordArgument;
 
-public class Mmu implements AddressSpace {
+public class Mmu implements AddressSpace, Dumpable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Mmu.class);
+
+    private Tracer tracer;
+    public Mmu(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     private static final AddressSpace VOID = new AddressSpace() {
         @Override
@@ -54,11 +61,15 @@ public class Mmu implements AddressSpace {
         checkByteArgument("value", value);
         checkWordArgument("address", address);
         getSpace(address).setByte(address, value);
+        this.tracer.writeMemoryInteraction("WRITE",address,value);
+
     }
 
     @Override
     public int getByte(int address) {
         checkWordArgument("address", address);
+
+        this.tracer.writeMemoryInteraction("READ",address,getSpace(address).getByte(address));
         return getSpace(address).getByte(address);
     }
 
@@ -71,4 +82,8 @@ public class Mmu implements AddressSpace {
         return VOID;
     }
 
+    @Override
+    public int read(int address) {
+        return this.getByte(address);
+    }
 }

@@ -187,7 +187,6 @@ public class Gpu implements AddressSpace {
                     mode = Mode.PixelTransfer;
                     phase = pixelTransferPhase.start(oamSearchPhase.getSprites());
                     break;
-
                 case PixelTransfer:
                     mode = Mode.HBlank;
                     phase = hBlankPhase.start(ticksInLine);
