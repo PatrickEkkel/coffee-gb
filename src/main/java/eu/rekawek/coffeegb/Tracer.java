@@ -40,7 +40,7 @@ public class Tracer {
     }
 
     private void writeMemoryTrace(Opcode opcode, Registers registers, AddressSpace addressSpace, int clockCycle) throws IOException {
-        if(opcode != null && opcode.getOpcode()  == 0x38 && clockCycle == 0 && opcodeCounter == 44046) {
+        if(opcode != null && opcode.getOpcode()  == 0x20 && clockCycle == 456) {
             System.out.println("bla");
         }
         this.clockCycles = clockCycle;
@@ -49,6 +49,7 @@ public class Tracer {
         String TIMA = toHex(addressSpace.getByte(0xFF05));
         String TAC =  toHex(addressSpace.getByte(0xFF07));
         String LY = toHex(addressSpace.getByte(0xFF44));
+        String STAT = toHex(addressSpace.getByte(0xFF41));
 
        // String LY = "0x0";
         //String DIV = toHex(addressSpace.getByte(0xFF04));
@@ -56,7 +57,7 @@ public class Tracer {
         String TMA = toHex(addressSpace.getByte(0xFF06));
         if(opcode != null) {
             //String registerState = String.format("OPCODE:%s;PC:%s;LY:%s;CLOCK:%s\n",toHex(opcode.getOpcode()),PC, LY,clockCycle);
-            String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,clockCycle);
+            String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;STAT:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,STAT,clockCycle);
             this.registerTraceWriter.write(registerState);
         }
 

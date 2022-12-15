@@ -37,7 +37,7 @@ public class Cpu {
 
     private Opcode currentOpcode;
 
-    private int cycles = -4;
+    public int cycles = -4;
 
     private List<Op> ops;
 

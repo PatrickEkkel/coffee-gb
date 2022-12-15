@@ -159,7 +159,7 @@ public class Gpu implements AddressSpace {
         }
     }
 
-    public Mode tick() {
+    public Mode tick(int cycles) {
         if (!lcdEnabled) {
             if (lcdEnabledDelay != -1) {
                 if (--lcdEnabledDelay == 0) {

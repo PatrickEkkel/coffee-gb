@@ -183,7 +183,7 @@ public class Gameboy implements Runnable {
         dma.tick();
         sound.tick();
         serialPort.tick();
-        return gpu.tick();
+        return gpu.tick(cpu.cycles);
     }
 
     public AddressSpace getAddressSpace() {
