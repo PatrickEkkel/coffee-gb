@@ -13,6 +13,8 @@ public class Tracer {
     private BufferedWriter opcodeWriter;
     private BufferedWriter memoryTraceWriter;
     private BufferedWriter registerTraceWriter;
+
+    private int rowCounter;
     public Tracer(String opcodeTraceFilename, String memoryTraceFilename, String registerTraceFilename) throws IOException {
         this.opcodeWriter = new BufferedWriter(new FileWriter(opcodeTraceFilename));
         this.memoryTraceWriter = new BufferedWriter(new FileWriter(memoryTraceFilename));
@@ -32,10 +34,12 @@ public class Tracer {
         String registerState = String.format("HL:%s;AF:%s;BC:%s;DE:%s;SP:%s",HL, AF,BC, DE, SP);
 
 
-        if(opcode != null) {
-            this.opcodeWriter.write(String.format("PC:%s;OPCODE:%s;%s;\n",toHex(registers.getPC()), toHex(opcode.getOpcode()), registerState));
-            //  this.opcodeWriter.write(String.format("C:%s;PC:%s;OPCODE:%s;\n", opcodeCounter, toHex(registers.getPC()), toHex(opcode.getOpcode())));
-        }
+
+            if(opcode != null) {
+                this.opcodeWriter.write(String.format("PC:%s;OPCODE:%s;%s;\n",toHex(registers.getPC()), toHex(opcode.getOpcode()), registerState));
+                //  this.opcodeWriter.write(String.format("C:%s;PC:%s;OPCODE:%s;\n", opcodeCounter, toHex(registers.getPC()), toHex(opcode.getOpcode())));
+            }
+
         opcodeCounter += 1;
     }
 
@@ -49,19 +53,22 @@ public class Tracer {
         String TIMA = toHex(addressSpace.getByte(0xFF05));
         String TAC =  toHex(addressSpace.getByte(0xFF07));
         String LY = toHex(addressSpace.getByte(0xFF44));
+        String LCDC = toHex(addressSpace.getByte(0xFF40));
+        String LYC = toHex(addressSpace.getByte(0xFF45));
         String STAT = toHex(addressSpace.getByte(0xFF41));
 
        // String LY = "0x0";
         //String DIV = toHex(addressSpace.getByte(0xFF04));
         String DIV = "0x0";
         String TMA = toHex(addressSpace.getByte(0xFF06));
-        if(opcode != null) {
-            //String registerState = String.format("OPCODE:%s;PC:%s;LY:%s;CLOCK:%s\n",toHex(opcode.getOpcode()),PC, LY,clockCycle);
-            String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;STAT:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,STAT,clockCycle);
-            this.registerTraceWriter.write(registerState);
+        if(this.rowCounter < 50000) {
+            if(opcode != null) {
+                //String registerState = String.format("OPCODE:%s;PC:%s;LY:%s;CLOCK:%s\n",toHex(opcode.getOpcode()),PC, LY,clockCycle);
+                String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;STAT:%s;LCDC:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,STAT,LCDC,LYC,clockCycle);
+                this.registerTraceWriter.write(registerState);
+                rowCounter++;
+            }
         }
-
-
     }
 
     public void writeMemoryInteraction(String action,int address, int value) {

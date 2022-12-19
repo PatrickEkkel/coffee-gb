@@ -77,14 +77,10 @@ public class Cpu {
     public void tick() throws IOException {
         if (++clockCycle >= (4 / speedMode.getSpeedMode())) {
             clockCycle = 0;
-         //   cycles++;
+            cycles += 4;
         } else {
             return;
         }
-        cycles += 4;
-
-
-
 
         if (state == State.OPCODE || state == State.HALTED || state == State.STOPPED) {
             if (interruptManager.isIme() && interruptManager.isInterruptRequested()) {
@@ -139,9 +135,11 @@ public class Cpu {
                     } else {
                         haltBugMode = false;
                     }
+                    //cycles++;
                     break;
 
                 case EXT_OPCODE:
+                    //cycles++;
                     tracer.write(currentOpcode,registers,addressSpace,cycles);
                     if (accessedMemory) {
                         return;
@@ -165,13 +163,14 @@ public class Cpu {
                     break;
 
                 case OPERAND:
+                  //  cycles++;
                     while (operandIndex < currentOpcode.getOperandLength()) {
                         if (accessedMemory) {
                             return;
                         }
                         accessedMemory = true;
                         operand[operandIndex++] = addressSpace.getByte(pc);
-                        registers.incrementPC();
+                        registers.incrementPC();;
                     }
                     ops = currentOpcode.getOps();
                     state = State.RUNNING;
@@ -179,6 +178,7 @@ public class Cpu {
                     break;
 
                 case RUNNING:
+                  //  cycles++;
                     if (opcode1 == 0x10) {
                         if (speedMode.onStop()) {
                             state = State.OPCODE;
@@ -213,9 +213,7 @@ public class Cpu {
                             handleSpriteBug(corruptionType);
                         }
                         opContext = op.execute(registers, addressSpace, operand, opContext);
-
-
-
+                        //cycles += 4;
 
                         op.switchInterrupts(interruptManager);
 
@@ -245,9 +243,8 @@ public class Cpu {
                 case STOPPED:
                     return;
             }
-            //cycles++;
+           // cycles += 4;
         }
-
     }
 
     private void handleInterrupt() {
