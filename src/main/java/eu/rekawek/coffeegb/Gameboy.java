@@ -139,6 +139,11 @@ public class Gameboy implements Runnable {
             Gpu.Mode newMode = null;
             try {
                 newMode = tick();
+               //f(newMode != null) {
+                if(cpu.traceLine.writeLine) {
+                    tracer.write(cpu.traceLine.currentOpcode, cpu.traceLine.registers, cpu.traceLine.pc,cpu.traceLine.addressSpace,cpu.traceLine.cycles);
+                }
+              //  }
             } catch (IOException e) {
                 e.printStackTrace();
             }

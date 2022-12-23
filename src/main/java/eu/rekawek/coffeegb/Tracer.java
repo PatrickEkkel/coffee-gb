@@ -25,7 +25,7 @@ public class Tracer {
         return String.format("0x%X", c);
     }
 
-    private void writeOpcode(Opcode opcode, Registers registers) throws IOException {
+    private void writeOpcode(Opcode opcode, Registers registers, int pc) throws IOException {
         String HL = toHex(registers.getHL());
         String AF = toHex(registers.getAF());
         String BC = toHex(registers.getBC());
@@ -34,21 +34,21 @@ public class Tracer {
         String registerState = String.format("HL:%s;AF:%s;BC:%s;DE:%s;SP:%s",HL, AF,BC, DE, SP);
 
 
-
+        if(this.rowCounter < 150000) {
             if(opcode != null) {
-                this.opcodeWriter.write(String.format("PC:%s;OPCODE:%s;%s;\n",toHex(registers.getPC()), toHex(opcode.getOpcode()), registerState));
+                this.opcodeWriter.write(String.format("PC:%s;OPCODE:%s;%s\n",toHex(pc), toHex(opcode.getOpcode()), registerState));
                 //  this.opcodeWriter.write(String.format("C:%s;PC:%s;OPCODE:%s;\n", opcodeCounter, toHex(registers.getPC()), toHex(opcode.getOpcode())));
             }
-
+        }
         opcodeCounter += 1;
     }
 
-    private void writeMemoryTrace(Opcode opcode, Registers registers, AddressSpace addressSpace, int clockCycle) throws IOException {
+    private void writeMemoryTrace(Opcode opcode, int pc, AddressSpace addressSpace, int clockCycle) throws IOException {
         if(opcode != null && opcode.getOpcode()  == 0x20 && clockCycle == 456) {
             System.out.println("bla");
         }
         this.clockCycles = clockCycle;
-        String PC = toHex(registers.getPC());
+        String PC = toHex(pc);
         String Clock = String.valueOf(clockCycle);
         String TIMA = toHex(addressSpace.getByte(0xFF05));
         String TAC =  toHex(addressSpace.getByte(0xFF07));
@@ -56,15 +56,18 @@ public class Tracer {
         String LCDC = toHex(addressSpace.getByte(0xFF40));
         String LYC = toHex(addressSpace.getByte(0xFF45));
         String STAT = toHex(addressSpace.getByte(0xFF41));
-
+        String IF = toHex(addressSpace.getByte(0xFF0F));
+        String IE = toHex(addressSpace.getByte(0xFFFF));
        // String LY = "0x0";
         //String DIV = toHex(addressSpace.getByte(0xFF04));
         String DIV = "0x0";
         String TMA = toHex(addressSpace.getByte(0xFF06));
-        if(this.rowCounter < 50000) {
+        if(this.rowCounter < 150000) {
             if(opcode != null) {
                 //String registerState = String.format("OPCODE:%s;PC:%s;LY:%s;CLOCK:%s\n",toHex(opcode.getOpcode()),PC, LY,clockCycle);
-                String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;STAT:%s;LCDC:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,STAT,LCDC,LYC,clockCycle);
+
+                String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;IF:%s;IE:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,IF, IE,LYC,clockCycle);
+              //  String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;STAT:%s;LCDC:%s;IF:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,STAT,LCDC,IF,LYC,clockCycle);
                 this.registerTraceWriter.write(registerState);
                 rowCounter++;
             }
@@ -89,9 +92,9 @@ public class Tracer {
 
 
     }
-    public void write(Opcode opcode, Registers registers, AddressSpace addressSpace, int clockCycle) throws IOException {
-        writeOpcode(opcode, registers);
-        writeMemoryTrace(opcode, registers, addressSpace, clockCycle);
+    public void write(Opcode opcode, Registers registers, int pc, AddressSpace addressSpace, int clockCycle) throws IOException {
+        writeOpcode(opcode, registers, pc);
+        writeMemoryTrace(opcode, pc, addressSpace, clockCycle);
     }
 
     public void close() throws IOException {

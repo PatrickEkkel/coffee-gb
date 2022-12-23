@@ -1,6 +1,7 @@
 package eu.rekawek.coffeegb.cpu;
 
 import eu.rekawek.coffeegb.AddressSpace;
+import eu.rekawek.coffeegb.TraceLine;
 import eu.rekawek.coffeegb.Tracer;
 import eu.rekawek.coffeegb.cpu.op.Op;
 import eu.rekawek.coffeegb.cpu.opcode.Opcode;
@@ -37,7 +38,7 @@ public class Cpu {
 
     private Opcode currentOpcode;
 
-    public int cycles = -4;
+    public int cycles = 0;
 
     private List<Op> ops;
 
@@ -61,6 +62,12 @@ public class Cpu {
 
     public Tracer tracer;
 
+    public TraceLine traceLine = new TraceLine();
+
+
+    public int pc;
+
+
 
 
     public Cpu(AddressSpace addressSpace, InterruptManager interruptManager, Gpu gpu, Display display, SpeedMode speedMode,Tracer tracer) throws IOException {
@@ -79,6 +86,7 @@ public class Cpu {
             clockCycle = 0;
             cycles += 4;
         } else {
+            this.traceLine.writeLine = false;
             return;
         }
 
@@ -107,9 +115,11 @@ public class Cpu {
         boolean accessedMemory = false;
         while (true) {
             int pc = registers.getPC();
+
             switch (state) {
                 case OPCODE:
                     clearState();
+                    this.pc = pc;
                     opcode1 = addressSpace.getByte(pc);
                     accessedMemory = true;
                     if (opcode1 == 0xcb) {
@@ -124,11 +134,9 @@ public class Cpu {
                             throw new IllegalStateException(String.format("No command for 0x%02x", opcode1));
                         }
                     }
-                    tracer.write(currentOpcode,registers,addressSpace, cycles);
 
-                    if(this.cycles > 69905) {
-                        this.cycles = 0;
-                    }
+
+
 
                     if (!haltBugMode) {
                         registers.incrementPC();
@@ -140,7 +148,7 @@ public class Cpu {
 
                 case EXT_OPCODE:
                     //cycles++;
-                    tracer.write(currentOpcode,registers,addressSpace,cycles);
+                    tracer.write(currentOpcode,registers,this.pc,addressSpace,cycles);
                     if (accessedMemory) {
                         return;
                     }
@@ -153,11 +161,11 @@ public class Cpu {
                         throw new IllegalStateException(String.format("No command for %0xcb 0x%02x", opcode2));
                     }
                     state = State.OPERAND;
-                    tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers,addressSpace,cycles);
+                    tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers, this.pc,addressSpace,cycles);
                   //  if(this.cycles > 69905) {
                    //     this.cycles = 0;
                     //}
-                   // cycles += 4;
+                    cycles += 4;
 
                     registers.incrementPC();
                     break;
@@ -170,11 +178,11 @@ public class Cpu {
                         }
                         accessedMemory = true;
                         operand[operandIndex++] = addressSpace.getByte(pc);
-                        registers.incrementPC();;
+                        registers.incrementPC();
                     }
                     ops = currentOpcode.getOps();
                     state = State.RUNNING;
-                   // tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers,addressSpace,cycles);
+                      // tracer.write(Opcodes.EXT_COMMANDS.get(opcode2),registers,addressSpace,cycles);
                     break;
 
                 case RUNNING:
@@ -213,7 +221,6 @@ public class Cpu {
                             handleSpriteBug(corruptionType);
                         }
                         opContext = op.execute(registers, addressSpace, operand, opContext);
-                        //cycles += 4;
 
                         op.switchInterrupts(interruptManager);
 
@@ -234,6 +241,17 @@ public class Cpu {
                     if (opIndex >= ops.size()) {
                         state = State.OPCODE;
                         operandIndex = 0;
+                        this.traceLine.addressSpace = addressSpace;
+                        this.traceLine.pc = this.pc;
+                        this.traceLine.currentOpcode = currentOpcode;
+                        this.traceLine.cycles = cycles;
+                        this.traceLine.registers = registers;
+                        this.traceLine.writeLine = true;
+                        if(this.cycles > 69905) {
+                            this.cycles = 0;
+                        }
+
+                        //tracer.write(currentOpcode,registers,this.pc,addressSpace, cycles);
                         interruptManager.onInstructionFinished();
                         return;
                     }
@@ -243,7 +261,6 @@ public class Cpu {
                 case STOPPED:
                     return;
             }
-           // cycles += 4;
         }
     }
 
