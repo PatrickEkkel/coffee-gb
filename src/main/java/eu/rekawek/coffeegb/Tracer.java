@@ -66,8 +66,8 @@ public class Tracer {
             if(opcode != null) {
                 //String registerState = String.format("OPCODE:%s;PC:%s;LY:%s;CLOCK:%s\n",toHex(opcode.getOpcode()),PC, LY,clockCycle);
 
-                String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;IF:%s;IE:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,IF, IE,LYC,clockCycle);
-              //  String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;STAT:%s;LCDC:%s;IF:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,STAT,LCDC,IF,LYC,clockCycle);
+               // String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;STAT:%s;IF:%s;IE:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA, STAT, IF, IE,LYC,clockCycle);
+                String registerState = String.format("OPCODE:%s;PC:%s;TIMA:%s;TAC:%s;DIV:%s;TMA:%s;LY:%s;STAT:%s;LCDC:%s;IF:%s;IE:%s;LYC:%s;CLOCK:%s\n",toHex(opcode.getOpcode()), PC, TIMA, TAC, DIV, TMA,LY,STAT,LCDC,IF,IE,LYC,clockCycle);
                 this.registerTraceWriter.write(registerState);
                 rowCounter++;
             }
